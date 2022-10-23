@@ -5,6 +5,9 @@ import java.util.Random;
 public class Logic {
     private int command = 0;
     private String[] byePhrase = new String[3];
+    MessageFromBot message = new MessageFromBot();
+    final int HELP = 1;
+    final int EXIT = 2;
 
     Logic() {
         byePhrase[0] = "Да прибудет с тобой сила!";
@@ -15,46 +18,48 @@ public class Logic {
     public boolean cantDetect(String request) {
 
         if (request.equals("help") || request.equals("Help")) {
-            command = 1;
+            command = HELP;
             return false;
         }
         if (request.equals("Пока") || request.equals("пока")) {
-            command = 2;
+            command = EXIT;
             return false;
         }
 
         return true;
     }
 
-    public boolean work() {
+    public MessageFromBot work() {
         switch (command) {
-            case 1:
+            case HELP:
                 return help();
             default:
                 return exit();
         }
     }
 
-    private boolean help() {
-        System.out.println("Приветствую тебя! Я бот-помощник-с-праздниками! +" +
-        " Я буду напоминать тебе о праздниках, могу сообщить какой праздник сегодня." +
-        "\n" +
-        "Также ты сможешь добавить свои праздники, например, дни рождения." +
-        "\n" +
-        "Чтобы ещё раз запросить информацию, напиши: help" +
-        "\n" +
-        "Чтобы закончить со мной общение, напиши: Пока" +
-        "\n" +
-        "А теперь, чего ты хочешь?");
-        return exit();
+    private MessageFromBot help() {
+        String answer = """
+        Приветствую тебя! Я бот-помощник-с-праздниками!
+        Я буду напоминать тебе о праздниках, могу сообщить какой праздник сегодня.
+        Также ты сможешь добавить свои праздники, например, дни рождения.
+        Чтобы ещё раз запросить информацию, напиши: help
+        Чтобы закончить со мной общение, напиши: Пока
+        А теперь, чего ты хочешь?""";
+        message.setMessage(answer);
+        exit();
+        return message;
     }
 
-    private boolean exit() {
-        if (command == 2) {
+    private MessageFromBot exit() {
+        if (command == EXIT) {
             Random r = new Random();
-            System.out.println(byePhrase[r.nextInt(3)]);
-            return true;
+            String phrase = (byePhrase[r.nextInt(3)]);
+            message.setMessage(phrase);
+            message.setExit(true);
+            return message;
         }
-        return false;
+        message.setExit(false);
+        return message;
     }
 }

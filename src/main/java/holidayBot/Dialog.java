@@ -4,13 +4,13 @@ import java.util.Scanner;
 
 public class Dialog {
     public static void main(String[] args) {
-        System.out.println("Привет, мешок с костями!" +
-        "\n" +
-        "Что ты хочешь?" +
-        "\n" +
-        "Если тебе нужно больше информации, напиши help)");
+        System.out.println("""
+        Привет, мешок с костями!
+        Что ты хочешь?
+        Если тебе нужно больше информации, напиши help)""");
 
-        Logic result = new Logic(); //здесь в итоге ответ от бота
+        Logic result = new Logic();
+        MessageFromBot answer = new MessageFromBot(); //здесь в итоге ответ от бота
         while (true) {
             Scanner input = new Scanner(System.in);
             String request = input.nextLine(); //здесь запрос от пользователя
@@ -20,7 +20,9 @@ public class Dialog {
                 continue;
             }
 
-            if ( result.work() ) { //здесь решается, надо ли прекратить общение
+            answer = result.work();
+            System.out.println(answer.getMessage());
+            if ( answer.toExit() ) { //здесь решается, надо ли прекратить общение
                 break;
             }
         }

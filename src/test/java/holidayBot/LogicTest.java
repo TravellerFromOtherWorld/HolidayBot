@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LogicTest {
     Logic testLogic = new Logic();
+    MessageFromBot testMessage = new MessageFromBot();
 
     @Test
     void cantDetect() {
@@ -19,12 +20,16 @@ class LogicTest {
     @Test
     void work() {
         testLogic.cantDetect("help");
-        assertFalse(testLogic.work());
+        testMessage = testLogic.work();
+        assertFalse(testMessage.toExit());
         testLogic.cantDetect("Help");
-        assertFalse(testLogic.work());
+        testMessage = testLogic.work();
+        assertFalse(testMessage.toExit());
         testLogic.cantDetect("пока");
-        assertTrue(testLogic.work());
+        testMessage = testLogic.work();
+        assertTrue(testMessage.toExit());
         testLogic.cantDetect("Пока");
-        assertTrue(testLogic.work());
+        testMessage = testLogic.work();
+        assertTrue(testMessage.toExit());
     }
 }
