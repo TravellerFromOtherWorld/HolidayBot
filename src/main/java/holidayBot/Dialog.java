@@ -35,7 +35,7 @@ public class Dialog {
                     System.out.println(answer.getMessage());
                 }
 
-                if (answer.getNewHoliday())
+                while (answer.getNewHoliday())
                 {
                     System.out.println("Введи дату праздника в виде 01.01.2000:");
                     String date = input.nextLine();

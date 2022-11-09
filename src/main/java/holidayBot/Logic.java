@@ -89,32 +89,38 @@ public class Logic {
 
     public MessageFromBot clientAuthentication(String login, String password)//функция проводит либо регистрацию, либо вход и возврашает сообщение
     {                                                                        //типа MessageFromBot, сообщая результат
-        if (client.getAuthenticationStatus())
+        if (login != "" && password != "")
         {
-            message.setMessage("""
-        Ты уже используешь свою учётную запись.
-        Чтобы зарегестрирвать другой аккаунт, выйди из системы.
-        Что будем делать дальше?""");
-            message.setAuthentication(false);
-            return message;
+
+            if (client.getAuthenticationStatus())
+            {
+                message.setMessage("""
+                Ты уже используешь свою учётную запись.
+                Чтобы зарегестрирвать другой аккаунт, выйди из системы.
+                Что будем делать дальше?""");
+                message.setAuthentication(false);
+                return message;
+            }
+            if (command == ENTER)
+            {
+                message = client.tryEnter(login, password);
+            }
+            if (command == REGISTER)
+            {
+                message = client.tryRegister(login, password);
+            }
+            if (message.getErrors() != 0)
+            {
+                message.setAuthentication(false);
+                return message;
+            }
+            if (client.getAuthenticationStatus()) {
+                message.addMessage(holiday.remindHoliday(client.getNickname(), client.getPassword()).getMessage());
+                message.addMessage("Что ты хочешь сделать дальше?");
+            }
         }
-        if (command == ENTER)
-        {
-            message = client.tryEnter(login, password);
-        }
-        if (command == REGISTER)
-        {
-            message = client.tryRegister(login, password);
-        }
-        if (message.getErrors() != 0)
-        {
-            message.setAuthentication(false);
-            return message;
-        }
-        if (client.getAuthenticationStatus()) {
-            message.addMessage(holiday.remindHoliday(client.getNickname(), client.getPassword()).getMessage());
-            message.addMessage("Что ты хочешь сделать дальше?");
-        }
+        else
+            message.setMessage("Заполните, пожалуйста, оба поля!");
         exit();
         return message;
     }
@@ -135,11 +141,16 @@ public class Logic {
 
     public MessageFromBot newHoliday(String date, String name)
     {
-        message = holiday.addNewHoliday(date, name,client.getNickname(), client.getPassword());
-        if (message.getErrors() == 0)
+        if (date != "" && name != "")
         {
-            message.addMessage("Что ты хочешь сделать дальше?");
+            message = holiday.addNewHoliday(date, name,client.getNickname(), client.getPassword());
+            if (message.getErrors() == 0)
+            {
+                message.addMessage("Что ты хочешь сделать дальше?");
+            }
         }
+        else
+            message.setMessage("Заполните, пожалуйста, оба поля!");
         exit();
         return message;
     }

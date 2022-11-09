@@ -34,7 +34,9 @@ public class WorkWithClient {
             answer.setAuthentication(false);
         }
         else if (answer.getErrors() == 0) {
-            answer.setMessage("Ты не достоин!");
+            answer.setMessage("""
+                                 Ты не достоин!
+                                 Приплыли... Что дальше?""");
         }
         return answer;
     }
