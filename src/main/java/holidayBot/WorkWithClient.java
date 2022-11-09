@@ -23,7 +23,7 @@ public class WorkWithClient {
     {
         return nickname;
     }
-    public MessageFromBot tryEnter(String login, String pass)
+    public MessageFromBot tryEnter(String login, String pass) //пользователь пытается войти в систему с логином и паролем.
     {
         if (findUser(login, pass))
         {
@@ -41,7 +41,7 @@ public class WorkWithClient {
         return answer;
     }
 
-    public MessageFromBot tryRegister(String login, String pass)
+    public MessageFromBot tryRegister(String login, String pass) //пользователь пытается зарегистрироваться в системе, вводя логин и пароль
     {
         if (findUser(login, pass))
         {
@@ -60,7 +60,7 @@ public class WorkWithClient {
         return answer;
     }
 
-    private boolean findUser(String login, String pass)
+    private boolean findUser(String login, String pass) //бот ищет пользователя в базе данных
     {
         try (BufferedReader fileReader = new BufferedReader(new FileReader("Users.txt")))
         {
