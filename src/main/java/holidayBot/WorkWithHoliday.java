@@ -58,7 +58,7 @@ public class WorkWithHoliday {
     //приватный метод для добавления праздника
     private void addHoliday(String date, String name, String nickname, String password) {
         try {
-            String holiday = nickname + ':' + password + ':' + date + ':' + name;
+            String holiday = nickname + ':' + password + ':' + date + ':' + name + "\n";
             fileWorker.writeDataToTheFile(holiday, "Holidays.txt");
         } catch (IOException e) {
             answer.setMessage("Произошла ошибка");

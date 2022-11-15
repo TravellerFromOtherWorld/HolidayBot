@@ -98,7 +98,7 @@ public class WorkWithClient {
 
     private void addNewUser(String login, String pass) {
         LocalDate date = LocalDate.now();
-        String userData = login + ':' + pass + ':' + date;
+        String userData = login + ':' + pass + ':' + date + "\n";
         try {
             fileWorker.writeDataToTheFile(userData, "Users.txt");
         }

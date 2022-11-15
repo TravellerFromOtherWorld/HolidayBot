@@ -1,16 +1,19 @@
 package holidayBot;
+
 import java.io.File;
+
 import org.junit.jupiter.api.*;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
 class WorkWithClientTest {
-
+    private Logic logic;
+    private MessageFromBot messageFromBot;
     private WorkWithClient testWorkWithClient;
 
-    public static StringBuilder readFile(String path)
-    {
+    public static StringBuilder readFile(String path) {
         File file = new File(path);
         StringBuilder builder = new StringBuilder();
         BufferedReader reader = null;
@@ -37,66 +40,47 @@ class WorkWithClientTest {
     @BeforeEach
     public void setup() {
         testWorkWithClient = new WorkWithClient();
+        logic = new Logic();
+        messageFromBot = new MessageFromBot();
+    }
+
+    @BeforeEach
+    void testTryRegister() {
+        testWorkWithClient.tryRegister("гарри", "гриффиндор");
+        int user1 = readFile("Users.txt").indexOf("гарри:гриффиндор");
+        Assertions.assertNotEquals(-1, user1);
+
     }
 
     @Test
     public void testTryEnter() {
-        testWorkWithClient.tryEnter("кот","Бонифаций");
-        int user1 = readFile("Users.txt").indexOf("кот Бонифаций");
-        Assertions.assertNotEquals(-1, user1);
-        testWorkWithClient.tryEnter("sdfvtgnhj","sdcvftyghkl");
-        int user2 = readFile("Users.txt").indexOf("sdfvtgnhj sdcvftyghkl");
-        Assertions.assertEquals(-1, user2);
-    }
-
-    @Test
-    @DisplayName("Should Not Enter When Login is Null")
-    public void shouldThrowRuntimeExceptionWhenLoginIsNullEnter() {
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            testWorkWithClient.tryEnter(null, "Бонифаций");
-        });
-    }
-
-    @Test
-    @DisplayName("Should Not Enter When Password is Null")
-    public void shouldThrowRuntimeExceptionWhenPassIsNullEnter() {
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            testWorkWithClient.tryEnter("кот", null);
-        });
-    }
-
-    @Test
-    void testTryRegister() {
-        testWorkWithClient.tryRegister("кот","Бонифаций");
-        int user1 = readFile("Users.txt").indexOf("кот Бонифаций");
-        Assertions.assertEquals(0, user1);
-        testWorkWithClient.tryRegister("sdfvtgnhj","sdcvftyghkl");
-        int user2 = readFile("Users.txt").indexOf("sdfvtgnhj sdcvftyghkl");
+        testWorkWithClient.tryEnter("кот", "Бонифаций");
+        int user1 = readFile("Users.txt").indexOf("кот:Бонифаций");
+        Assertions.assertEquals(-1, user1);
+        testWorkWithClient.tryEnter("гарри", "гриффиндор");
+        int user2 = readFile("Users.txt").indexOf("гарри:гриффиндор");
         Assertions.assertNotEquals(-1, user2);
-
     }
 
     @Test
-    @DisplayName("Should Not Register When Login is Null")
-    public void shouldThrowRuntimeExceptionWhenLoginIsNullRegister() {
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            testWorkWithClient.tryRegister(null, "Бонифаций");
-        });
+    @DisplayName("Should Not Enter And Register When Login is Null")
+    public void shouldNotEnterAndRegisterWhenLoginIsNull() {
+        messageFromBot = logic.clientAuthentication("", "грифиндор");
+        Assertions.assertEquals("Заполните, пожалуйста, оба поля!",messageFromBot.getMessage());
     }
 
     @Test
-    @DisplayName("Should Not Register When Password is Null")
-    public void shouldThrowRuntimeExceptionWhenPassIsNullRegister() {
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            testWorkWithClient.tryEnter("кот", null);
-        });
+    @DisplayName("Should Not Enter And Register When Password is Null")
+    public void shouldNotEnterAndRegisterWhenPassIsNull() {
+        messageFromBot = logic.clientAuthentication("гарри", "");
+        Assertions.assertEquals("Заполните, пожалуйста, оба поля!",messageFromBot.getMessage());
     }
 
     @Test
-    @DisplayName("Should Not Register When Password and Login Are Null")
-    public void shouldThrowRuntimeExceptionWhenPassAndLoginAreNullRegister() {
-        Assertions.assertThrows(RuntimeException.class, () -> {
-            testWorkWithClient.tryEnter(null, null);
-        });
+    @DisplayName("Should Not Enter And Register When Password and Login Are Null")
+    public void shouldNotEnterAndRegisterWhenPassAndLoginAreNullRegister() {
+        messageFromBot = logic.clientAuthentication("", "");
+        Assertions.assertEquals("Заполните, пожалуйста, оба поля!",messageFromBot.getMessage());
     }
+
 }

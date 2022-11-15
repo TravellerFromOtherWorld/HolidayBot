@@ -1,5 +1,8 @@
 package holidayBot;
+
 import java.io.*;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -7,6 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 class WorkWithHolidayTest {
 
     private WorkWithHoliday testWorkWithHoliday;
+    private MessageFromBot messageFromBot;
+    private WorkWithClient workWithClient;
     private Logic logic;
 
     public static StringBuilder readFile(String path) {
@@ -37,16 +42,23 @@ class WorkWithHolidayTest {
     }
 
     @BeforeEach
+    public void theDestinedOne(){
+        workWithClient.tryRegister("гарри","гриффиндор");
+    }
+
+    @BeforeEach
     public void setup() {
         testWorkWithHoliday = new WorkWithHoliday();
+        workWithClient = new WorkWithClient();
         logic = new Logic();
+        messageFromBot = new MessageFromBot();
     }
 
     @Test
     public void testAddNewHoliday() {
-        testWorkWithHoliday.addNewHoliday("09.11.2002", "День Чая", "кот", "Бонифаций");
+        testWorkWithHoliday.addNewHoliday("2022-11-11", "кража философского камня", "гарри", "гриффиндор");
         Assertions.assertFalse(readFile("Holidays.txt").length() == 0);
-        int index = readFile("Holidays.txt").indexOf("09.11.2002:День Чая:кот:Бонифаций");
+        int index = readFile("Holidays.txt").indexOf("гарри:гриффиндор:2022-11-11:кража философского камня");
         Assertions.assertNotEquals(-1, index);
     }
 
@@ -55,7 +67,7 @@ class WorkWithHolidayTest {
     public void shouldNotAddNewHolidayWhenDateIsEmpty() {
         logic.clientAuthentication("дмитрий", "лжедмитрий");
         logic.newHoliday("", "Сбор Дани");
-        int index = readFile("Holidays.txt").indexOf(":Сбор Дани:дмитрий:лжедмитрий");
+        int index = readFile("Holidays.txt").indexOf("дмитрий:лжедмитрий::Cбор Дани");
         Assertions.assertEquals(-1, index);
     }
 
@@ -63,8 +75,8 @@ class WorkWithHolidayTest {
     @DisplayName("Should Not Add New Holiday When Name is Empty")
     public void shouldNotAddNewHolidayWhenNameIsEmpty() {
         logic.clientAuthentication("дмитрий", "лжедмитрий");
-        logic.newHoliday("12.10.1605", "");
-        int index = readFile("Holidays.txt").indexOf("12.10.1605::дмитрий:лжедмитрий");
+        logic.newHoliday("1605-2-14", "");
+        int index = readFile("Holidays.txt").indexOf("дмитрий:лжедмитрий:1605-2-14:");
         Assertions.assertEquals(-1, index);
     }
 
@@ -73,27 +85,27 @@ class WorkWithHolidayTest {
     public void shouldNotAddNewHolidayWhenNameAndDateAreEmpty() {
         logic.clientAuthentication("дмитрий", "лжедмитрий");
         logic.newHoliday("", "");
-        int index = readFile("Holidays.txt").indexOf("::дмитрий:лжедмитрий");
+        int index = readFile("Holidays.txt").indexOf("дмитрий:лжедмитрий::");
         Assertions.assertEquals(-1, index);
     }
 
     @Test
     void remindHoliday() {
-        testWorkWithHoliday.addNewHoliday("09.11.2022", "Сбор дани", "кот", "Бонифаций");
-        testWorkWithHoliday.remindHoliday("кот", "Бонифаций");
-        Assertions.assertTrue(readFile("MarkedHolidays.txt").length() != 0);
+        testWorkWithHoliday.addNewHoliday(String.valueOf(LocalDate.now()), "сбор команды по квиддичу", "гарри", "гриффиндор");
+        messageFromBot= testWorkWithHoliday.remindHoliday("гарри", "гриффиндор", LocalDate.now());
+        Assertions.assertFalse(messageFromBot.isEmpty());
     }
 
     @DisplayName("Date should match the required Format True")
     @ParameterizedTest
-    @CsvSource({"9.11.2022", "21.12.2000", "15.8.2011"})
+    @CsvSource({"2022-11-09", "2000-12-12", "2011-02-28"})
     public void shouldTestDateFormatTrue(String date) {
         Assertions.assertTrue(testWorkWithHoliday.correctDate(date));
     }
 
     @DisplayName("Date should match the required Format False")
     @ParameterizedTest
-    @CsvSource({"89.13.2022", "30.2.2000", "15.8.888"})
+    @CsvSource({"2022-14-99", "2000-2-31", "888-2-1"})
     public void shouldTestDateFormatFalse(String date) {
         Assertions.assertFalse(testWorkWithHoliday.correctDate(date));
     }
