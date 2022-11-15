@@ -1,52 +1,65 @@
 package holidayBot;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class WorkWithClient {
     private MessageFromBot answer = new MessageFromBot();
     private String nickname;
     private String password;
     private boolean authenticationStatus = false;
+    private LocalDate dayLastAuth;
+    private WorkWithFiles fileWorker = new WorkWithFiles();
     final int fileError = 1;
 
-    public boolean getAuthenticationStatus()
-    {
+    public boolean getAuthenticationStatus() {
         return authenticationStatus;
     }
 
-    public String getPassword()
-    {
+    public String getPassword() {
         return password;
     }
 
-    public String getNickname()
-    {
+    public String getNickname() {
         return nickname;
     }
-    public MessageFromBot tryEnter(String login, String pass) //пользователь пытается войти в систему с логином и паролем.
-    {
-        if (findUser(login, pass))
-        {
+    public LocalDate getDayLastAuth(){
+        return dayLastAuth;
+    }
+
+    //пользователь пытается войти в систему с логином и паролем.
+    public MessageFromBot tryEnter(String login, String pass) {
+        Storage user = findUser(login, pass);
+        if (user != null) {
             answer.setMessage("Привет! Давно не виделись)");
             nickname = login;
             password = pass;
+            dayLastAuth = user.getDate();
             authenticationStatus = true;
             answer.setAuthentication(false);
-        }
-        else if (answer.getErrors() == 0) {
+            try{
+                fileWorker.rewriteAllFile(user, "Users.txt");
+            } catch (IOException ex){
+                answer.setMessage("Произошла ошибка");
+                answer.setErrors(fileError);
+                return answer;
+            }
+
+        } else if (answer.getErrors() == 0) {
             answer.setMessage("""
-                                 Ты не достоин!
-                                 Приплыли... Что дальше?""");
+                    Ты не достоин!
+                    Приплыли... Что дальше?""");
         }
         return answer;
     }
 
-    public MessageFromBot tryRegister(String login, String pass) //пользователь пытается зарегистрироваться в системе, вводя логин и пароль
-    {
-        if (findUser(login, pass))
-        {
-            if (answer.getErrors() == 0)
-            {
+    //пользователь пытается зарегистрироваться в системе, вводя логин и пароль
+    public MessageFromBot tryRegister(String login, String pass) {
+        if (findUser(login, pass) != null) {
+            if (answer.getErrors() == 0) {
                 answer.setMessage("Придумай другой логин и пароль");
             }
             return answer;
@@ -54,45 +67,42 @@ public class WorkWithClient {
         addNewUser(login, pass);
         if (answer.getErrors() == 0) {
             answer.setMessage("Регистрация прошла упешно!");
+            nickname = login;
+            password = pass;
+            dayLastAuth = LocalDate.now();
             answer.setAuthentication(false);
             authenticationStatus = true;
         }
         return answer;
     }
 
-    private boolean findUser(String login, String pass) //бот ищет пользователя в базе данных
-    {
-        try (BufferedReader fileReader = new BufferedReader(new FileReader("Users.txt")))
-        {
-            String user = fileReader.readLine();
-            while (user != null)
-            {
-                String[] userData = user.split(" ");
-                if (login.equals(userData[0]) && pass.equals(userData[1]))
-                {
-                    return true;
-                }
-                user = fileReader.readLine();
-            }
-        }
-        catch (IOException e)
-        {
+    //бот ищет пользователя в базе данных
+    private Storage findUser(String login, String pass) {
+        List<Storage> userData = new ArrayList<Storage>();
+        try {
+            userData = fileWorker.getDataFromFile("Users.txt");
+        } catch (IOException e) {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
+            return null;
         }
-        return false;
+        if (userData.isEmpty())
+            return null;
+        for (Storage element : userData) {
+            if (Objects.equals(login, element.getNickname()) && Objects.equals(pass, element.getPassword())){
+                return element;
+            }
+        }
+        return null;
     }
 
-    private void addNewUser(String login, String pass)
-    {
-        try (FileWriter writer = new FileWriter("Users.txt", true)) {
-            String userData = login + ' ' + pass;
-            writer.write(userData);
-            writer.append('\n');
-            writer.flush();
+    private void addNewUser(String login, String pass) {
+        LocalDate date = LocalDate.now();
+        String userData = login + ':' + pass + ':' + date;
+        try {
+            fileWorker.writeDataToTheFile(userData, "Users.txt");
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
         }

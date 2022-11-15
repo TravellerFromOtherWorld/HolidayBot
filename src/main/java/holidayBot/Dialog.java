@@ -22,7 +22,7 @@ public class Dialog {
 
                 answer = result.work();
 
-                if (answer.getAuthentication() == false) {
+                if (!answer.getAuthentication()) {
                     System.out.println(answer.getMessage());
                 }
 
@@ -35,9 +35,8 @@ public class Dialog {
                     System.out.println(answer.getMessage());
                 }
 
-                while (answer.getNewHoliday())
-                {
-                    System.out.println("Введи дату праздника в виде 1.1.2000:");
+                while (answer.getNewHoliday()) {
+                    System.out.println("Введи дату праздника в виде 2000-1-1:");
                     String date = input.nextLine();
                     System.out.println("Введите название праздника:");
                     String name = input.nextLine();

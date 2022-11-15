@@ -13,36 +13,30 @@ public class MessageFromBot {
         message = text;
     }
 
-    public void setNewHoliday(boolean holiday)
-    {
+    public void setNewHoliday(boolean holiday) {
         newHoliday = holiday;
     }
 
-    public boolean getNewHoliday()
-    {
+    public boolean getNewHoliday() {
         return newHoliday;
     }
 
-    public void setErrors(int ex)
-    {
+    public void setErrors(int ex) {
         errors = ex;
     }
 
-    public int getErrors()
-    {
+    public int getErrors() {
         return errors;
     }
 
-    public void addMessage(String newText)
-    {
+    public void addMessage(String newText) {
         if (message == null)
             setMessage(newText);
         else
             message = message + '\n' + newText;
     }
 
-    public void setAuthentication(boolean auth)
-    {
+    public void setAuthentication(boolean auth) {
         authentication = auth;
     }
 
@@ -62,8 +56,7 @@ public class MessageFromBot {
         return exit;
     }
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return message == null;
     }
 }
