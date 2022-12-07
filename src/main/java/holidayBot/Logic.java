@@ -24,23 +24,23 @@ public class Logic {
     //функция определяет, что именно хочет сделать пользователь
     public boolean cantDetect(String request) {
 
-        if (request.equals("help") || request.equals("Help")) {
+        if (request.equals("/help")) {
             command = HELP;
             return false;
         }
-        if (request.equals("вход") || request.equals("Вход")) {
+        if (request.equals("/entry")) {
             command = ENTER;
             return false;
         }
-        if (request.equals("Регистрация") || request.equals("регистрация")) {
+        if (request.equals("/register")) {
             command = REGISTER;
             return false;
         }
-        if (request.equals("Пока") || request.equals("пока")) {
+        if (request.equals("/bye")) {
             command = EXIT;
             return false;
         }
-        if (request.equals("Добавить праздник") || request.equals("добавить праздник")) {
+        if (request.equals("/addHoliday")) {
             command = ADDHOLIDAY;
             return false;
         }
@@ -67,11 +67,11 @@ public class Logic {
                 Приветствую тебя! Я бот-помощник-с-праздниками!
                 Я буду напоминать тебе о праздниках, могу сообщить какой праздник сегодня.
                 Также ты сможешь добавить свои праздники, например, дни рождения.
-                Чтобы ещё раз запросить информацию, напиши: "help"
-                Чтобы закончить со мной общение, напиши: "Пока"
-                Чтобы войти в систему, напиши: "Вход"
-                Чтобы зарегестрироваться, напиши: "Регистрация"
-                Чтобы добавить праздник, напиши: "Добавить праздник"
+                Чтобы ещё раз запросить информацию, напиши: "/help"
+                Чтобы закончить со мной общение, напиши: "/bye"
+                Чтобы войти в систему, напиши: "/entry"
+                Чтобы зарегестрироваться, напиши: "/register"
+                Чтобы добавить праздник, напиши: "/addHoliday"
                 А теперь, чего ты хочешь?""";
         message.setMessage(answer);
         exit();
@@ -144,6 +144,7 @@ public class Logic {
             String phrase = (byePhrase[r.nextInt(3)]);
             message.setMessage(phrase);
             message.setExit(true);
+            client.exit();
             return message;
         }
         message.setExit(false);

@@ -37,12 +37,9 @@ public class WorkWithHoliday {
             {
                 for (Storage element : holidayStorage){
                     if (Objects.equals(nickname, element.getNickname()) && Objects.equals(password, element.getPassword())){
-                        if (element.getDate().isAfter(dateOfLastAuth)  && element.getDate().isBefore(LocalDate.now())){
+                        if (compareDates(dateOfLastAuth, LocalDate.now(), element.getDate())){
                             answer.addMessage("Не забудь " + element.getDate().getDayOfMonth() + " " + element.getDate().getMonth() + " - " + element.getNameHoliday() + " :)");
-                            continue;
                         }
-                        if (element.getDate().isEqual(LocalDate.now()))
-                            answer.addMessage("Не забудь " + element.getDate().getDayOfMonth() + " " + element.getDate().getMonth() + " - " + element.getNameHoliday() + " :)");
                     }
                 }
             }
@@ -64,5 +61,14 @@ public class WorkWithHoliday {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
         }
+    }
+
+    private boolean compareDates(LocalDate dayLastAuth, LocalDate today, LocalDate holidayDay){
+        if ((holidayDay.getMonthValue() <= today.getMonthValue()) && (holidayDay.getMonthValue() >= dayLastAuth.getDayOfMonth())){
+            if ((holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth())){
+                return true;
+            }
+        }
+        return false;
     }
 }

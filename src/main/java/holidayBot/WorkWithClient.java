@@ -107,4 +107,11 @@ public class WorkWithClient {
             answer.setErrors(fileError);
         }
     }
+
+    public void exit(){
+        nickname = null;
+        password = null;
+        authenticationStatus = false;
+        dayLastAuth = null;
+    }
 }
