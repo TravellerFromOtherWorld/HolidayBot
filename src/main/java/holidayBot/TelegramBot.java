@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class bot extends TelegramLongPollingBot {
+public class TelegramBot extends TelegramLongPollingBot {
     private Logic logic = new Logic();
     private MessageFromBot answer = new MessageFromBot();
     private boolean setNickname = false;
@@ -24,12 +24,12 @@ public class bot extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         return "TestBot№1";
-    }
+    }//environment vars
 
     @Override
     public String getBotToken() {
         return "5811330333:AAHsJFoPpdw-EvvmqiJxsoj5p91uD6sjpmk";
-    }
+    }//environment vars
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -37,54 +37,53 @@ public class bot extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             var msg = update.getMessage().getText();
             var user = update.getMessage().getChatId();
-            iDontKnow(msg, user);
+            detectCommand(msg, user, update.getMessage().isCommand());
 
         } else if (update.hasCallbackQuery()) {
             var msg = update.getCallbackQuery().getData();
             var user = update.getCallbackQuery().getMessage().getChatId();
-            iDontKnow(msg, user);
+            detectCommand(msg, user, true);
         }
     }
 
-    private void iDontKnow(String msg, Long user) {
+    private void detectCommand(String msg, Long user, boolean command) {
+        if (command) {
+            if (Objects.equals(msg, "/start")) {
+                String text = """
+                        Привет, мешок с костями!
+                        Что ты хочешь?
+                        Если тебе нужно больше информации, напиши help)""";
+                sendText(user, text, true);
+                return;
+            }
 
-        if (answer.getAuthentication()) {
+            if (logic.cantDetect(msg)) { //здесь распознаётся запрос
+                sendText(user, "Ай карамба! Ты ошибся, попробуй ещё раз!", false);
+            } else {
+                answer = logic.work();
+
+                if (!answer.getAuthentication()) {
+                    if (answer.getNewHoliday()) {
+                        addHoliday(user, answer.getMessage());
+                        return;
+                    }
+                    if (answer.toExit()) {
+                        sendText(user, answer.getMessage(), false);
+                        answer.cleanMessage();
+                    } else {
+                        sendText(user, answer.getMessage(), true);
+                    }
+                } else {
+                    Authentication(user, msg);
+                }
+            }
+        } else if (answer.getAuthentication()) {
             Authentication(user, msg);
-            return;
         } else if (answer.getNewHoliday()) {
             addHoliday(user, msg);
-            return;
-        }
-        if (Objects.equals(msg, "/start")) {
-            String text = """
-                    Привет, мешок с костями!
-                    Что ты хочешь?
-                    Если тебе нужно больше информации, напиши help)""";
-            sendText(user, text, true);
-            return;
-        }
-
-        if (logic.cantDetect(msg)) { //здесь распознаётся запрос
-            sendText(user, "Ай карамба! Ты ошибся, попробуй ещё раз!", false);
-            return;
         } else {
-            answer = logic.work();
-
-            if (!answer.getAuthentication()) {
-                if (answer.getNewHoliday()){
-                    addHoliday(user, answer.getMessage());
-                    return;
-                }
-                if (answer.toExit()) {
-                    sendText(user, answer.getMessage(), false);
-                } else {
-                    sendText(user, answer.getMessage(), true);
-                }
-            } else {
-                Authentication(user, msg);
-            }
+            sendText(user, "Ай карамба! Ты ошибся, попробуй ещё раз!", false);
         }
-
     }
 
 

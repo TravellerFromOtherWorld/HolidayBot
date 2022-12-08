@@ -10,7 +10,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 
 public class WorkWithFiles {
-    public List<Storage> getDataFromFile(String filename) throws IOException {
+    private String filename;
+    public WorkWithFiles(String file){
+        filename = file;
+    }
+    public List<Storage> getDataFromFile() throws IOException {
         List<Storage> dataStorage = new ArrayList<Storage>();
         Path pathToFile = Path.of(filename);
         if (fileExistence(pathToFile)){
@@ -45,7 +49,7 @@ public class WorkWithFiles {
         return element;
     }
 
-    public void writeDataToTheFile(String data, String filename) throws IOException {
+    public void writeDataToTheFile(String data) throws IOException {
         Path pathToFile = Path.of(filename);
         if (fileExistence(pathToFile)){
             Files.writeString(pathToFile, data, StandardOpenOption.APPEND);
@@ -69,7 +73,7 @@ public class WorkWithFiles {
         return Files.readAllLines(pathToFile);
     }
 
-    public void rewriteAllFile(Storage elemToRewrite, String filename) throws IOException {
+    public void rewriteAllFile(Storage elemToRewrite) throws IOException {
         Path pathToFile = Path.of(filename);
         List<String> oldData = readFile(pathToFile);
         for (String userData : oldData){

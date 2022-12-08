@@ -9,7 +9,8 @@ public class WorkWithHoliday {
     private final int fileError = 1;
 
     private MessageFromBot answer = new MessageFromBot();
-    private WorkWithFiles fileWorker = new WorkWithFiles();
+    private WorkWithFiles fileWorkerPersonal = new WorkWithFiles("Holidays.txt");
+    private WorkWithFiles fileWorkerGlobal = new WorkWithFiles("GlobalHolidays.txt");
 
     public boolean correctDate(String date) {
         if (date.matches("^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$"))
@@ -32,7 +33,13 @@ public class WorkWithHoliday {
 
     public MessageFromBot remindHoliday(String nickname, String password, LocalDate dateOfLastAuth) {
         try {
-            List<Storage> holidayStorage = fileWorker.getDataFromFile("Holidays.txt");
+            List<Storage> holidayStorageGlobal = fileWorkerGlobal.getDataFromFile();
+            for (Storage element : holidayStorageGlobal){
+                if (compareDates(dateOfLastAuth, LocalDate.now(), element.getDate())){
+                    answer.addMessage("Не забудь " + element.getDate().getDayOfMonth() + " " + element.getDate().getMonth() + " - " + element.getNameHoliday() + " :)");
+                }
+            }
+            List<Storage> holidayStorage = fileWorkerPersonal.getDataFromFile();
             if (!(holidayStorage.isEmpty()))
             {
                 for (Storage element : holidayStorage){
@@ -56,7 +63,7 @@ public class WorkWithHoliday {
     private void addHoliday(String date, String name, String nickname, String password) {
         try {
             String holiday = nickname + ':' + password + ':' + date + ':' + name + "\n";
-            fileWorker.writeDataToTheFile(holiday, "Holidays.txt");
+            fileWorkerPersonal.writeDataToTheFile(holiday);
         } catch (IOException e) {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
@@ -64,11 +71,24 @@ public class WorkWithHoliday {
     }
 
     private boolean compareDates(LocalDate dayLastAuth, LocalDate today, LocalDate holidayDay){
-        if ((holidayDay.getMonthValue() <= today.getMonthValue()) && (holidayDay.getMonthValue() >= dayLastAuth.getDayOfMonth())){
-            if ((holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth())){
+        if (dayLastAuth.getMonthValue() == 12){
+            if (today.getMonthValue() == 12){
+                return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
+            } else {
                 return true;
             }
         }
-        return false;
+
+        if ((dayLastAuth.getMonthValue() == today.getMonthValue()) && (holidayDay.getMonthValue() == today.getMonthValue())){
+            return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
+        }
+
+        if (holidayDay.getMonthValue() == dayLastAuth.getMonthValue())
+            return (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
+
+        if (holidayDay.getMonthValue() == today.getMonthValue())
+            return (holidayDay.getDayOfMonth() <= today.getDayOfMonth());
+
+        return (holidayDay.getMonthValue() < today.getMonthValue()) && (holidayDay.getMonthValue() >= dayLastAuth.getMonthValue());
     }
 }

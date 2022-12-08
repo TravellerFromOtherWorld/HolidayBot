@@ -142,6 +142,7 @@ public class Logic {
         if (command == EXIT) {
             Random r = new Random();
             String phrase = (byePhrase[r.nextInt(3)]);
+            message.cleanMessage();
             message.setMessage(phrase);
             message.setExit(true);
             client.exit();

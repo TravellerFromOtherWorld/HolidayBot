@@ -12,7 +12,7 @@ public class WorkWithClient {
     private String password;
     private boolean authenticationStatus = false;
     private LocalDate dayLastAuth;
-    private WorkWithFiles fileWorker = new WorkWithFiles();
+    private WorkWithFiles fileWorker = new WorkWithFiles("Users.txt");
     final int fileError = 1;
 
     public boolean getAuthenticationStatus() {
@@ -41,7 +41,7 @@ public class WorkWithClient {
             authenticationStatus = true;
             answer.setAuthentication(false);
             try{
-                fileWorker.rewriteAllFile(user, "Users.txt");
+                fileWorker.rewriteAllFile(user);
             } catch (IOException ex){
                 answer.setMessage("Произошла ошибка");
                 answer.setErrors(fileError);
@@ -80,7 +80,7 @@ public class WorkWithClient {
     private Storage findUser(String login, String pass) {
         List<Storage> userData = new ArrayList<Storage>();
         try {
-            userData = fileWorker.getDataFromFile("Users.txt");
+            userData = fileWorker.getDataFromFile();
         } catch (IOException e) {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
@@ -100,7 +100,7 @@ public class WorkWithClient {
         LocalDate date = LocalDate.now();
         String userData = login + ':' + pass + ':' + date + "\n";
         try {
-            fileWorker.writeDataToTheFile(userData, "Users.txt");
+            fileWorker.writeDataToTheFile(userData);
         }
         catch (IOException e) {
             answer.setMessage("Произошла ошибка");
