@@ -26,7 +26,8 @@ public class WorkWithClient {
     public String getNickname() {
         return nickname;
     }
-    public LocalDate getDayLastAuth(){
+
+    public LocalDate getDayLastAuth() {
         return dayLastAuth;
     }
 
@@ -40,9 +41,9 @@ public class WorkWithClient {
             dayLastAuth = user.getDate();
             authenticationStatus = true;
             answer.setAuthentication(false);
-            try{
+            try {
                 fileWorker.rewriteAllFile(user);
-            } catch (IOException ex){
+            } catch (IOException ex) {
                 answer.setMessage("Произошла ошибка");
                 answer.setErrors(fileError);
                 return answer;
@@ -89,7 +90,7 @@ public class WorkWithClient {
         if (userData.isEmpty())
             return null;
         for (Storage element : userData) {
-            if (Objects.equals(login, element.getNickname()) && Objects.equals(pass, element.getPassword())){
+            if (Objects.equals(login, element.getNickname()) && Objects.equals(pass, element.getPassword())) {
                 return element;
             }
         }
@@ -101,14 +102,13 @@ public class WorkWithClient {
         String userData = login + ':' + pass + ':' + date + "\n";
         try {
             fileWorker.writeDataToTheFile(userData);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
         }
     }
 
-    public void exit(){
+    public void exit() {
         nickname = null;
         password = null;
         authenticationStatus = false;

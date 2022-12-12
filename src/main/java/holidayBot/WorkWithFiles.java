@@ -11,19 +11,21 @@ import java.util.Objects;
 
 public class WorkWithFiles {
     private String filename;
-    public WorkWithFiles(String file){
+
+    public WorkWithFiles(String file) {
         filename = file;
     }
+
     public List<Storage> getDataFromFile() throws IOException {
         List<Storage> dataStorage = new ArrayList<Storage>();
         Path pathToFile = Path.of(filename);
-        if (fileExistence(pathToFile)){
+        if (fileExistence(pathToFile)) {
             List<String> fileData = readFile(pathToFile);
-            for (String line : fileData){
+            for (String line : fileData) {
                 if (Objects.equals(line, ""))
                     continue;
                 Storage element = formatStorage(line);
-                if (element == null){
+                if (element == null) {
                     continue;
                 }
                 dataStorage.add(element);
@@ -33,7 +35,7 @@ public class WorkWithFiles {
         return dataStorage;
     }
 
-    private Storage formatStorage(String line){
+    private Storage formatStorage(String line) {
         String[] lineParts = line.split(":");
         String[] dataParts = lineParts[2].split("-");
         int year = Integer.parseInt(dataParts[0]);
@@ -51,10 +53,9 @@ public class WorkWithFiles {
 
     public void writeDataToTheFile(String data) throws IOException {
         Path pathToFile = Path.of(filename);
-        if (fileExistence(pathToFile)){
+        if (fileExistence(pathToFile)) {
             Files.writeString(pathToFile, data, StandardOpenOption.APPEND);
-        }
-        else{
+        } else {
             createNewFile(pathToFile);
             Files.writeString(pathToFile, data, StandardOpenOption.APPEND);
         }
@@ -76,9 +77,9 @@ public class WorkWithFiles {
     public void rewriteAllFile(Storage elemToRewrite) throws IOException {
         Path pathToFile = Path.of(filename);
         List<String> oldData = readFile(pathToFile);
-        for (String userData : oldData){
+        for (String userData : oldData) {
             String[] dataParts = userData.split(":");
-            if (Objects.equals(elemToRewrite.getNickname(), dataParts[0]) && Objects.equals(elemToRewrite.getPassword(), dataParts[1])){
+            if (Objects.equals(elemToRewrite.getNickname(), dataParts[0]) && Objects.equals(elemToRewrite.getPassword(), dataParts[1])) {
                 String newUserData = dataParts[0] + ':' + dataParts[1] + ':' + LocalDate.now();
                 oldData.remove(userData);
                 oldData.add(newUserData);

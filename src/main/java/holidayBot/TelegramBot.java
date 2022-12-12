@@ -2,6 +2,7 @@ package holidayBot;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -23,12 +24,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "TestBot№1";
+        return "HolidayBot";
     }//environment vars
 
     @Override
     public String getBotToken() {
-        return "5811330333:AAHsJFoPpdw-EvvmqiJxsoj5p91uD6sjpmk";
+        return "5868427343:AAEvBAjFe0VoMkCb5JMwMsIiVCWEIANQn9o";
     }//environment vars
 
     @Override
@@ -162,7 +163,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardButton2.setCallbackData("/entry");
         inlineKeyboardButton3.setText("Регистрация");
         inlineKeyboardButton3.setCallbackData("/register");
-        inlineKeyboardButton4.setText("Новый прздник");
+        inlineKeyboardButton4.setText("Новый праздник");
         inlineKeyboardButton4.setCallbackData("/addHoliday");
         inlineKeyboardButton5.setText("Пока");
         inlineKeyboardButton5.setCallbackData("/bye");
