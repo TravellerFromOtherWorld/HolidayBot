@@ -34,23 +34,22 @@ public class WorkWithHoliday {
     public MessageFromBot remindHoliday(String nickname, String password, LocalDate dateOfLastAuth) {
         try {
             List<Storage> holidayStorageGlobal = fileWorkerGlobal.getDataFromFile();
-            for (Storage element : holidayStorageGlobal){
-                if (compareDates(dateOfLastAuth, LocalDate.now(), element.getDate())){
+            for (Storage element : holidayStorageGlobal) {
+                if (compareDates(dateOfLastAuth, LocalDate.now(), element.getDate())) {
                     answer.addMessage("Не забудь " + element.getDate().getDayOfMonth() + " " + element.getDate().getMonth() + " - " + element.getNameHoliday() + " :)");
                 }
             }
             List<Storage> holidayStorage = fileWorkerPersonal.getDataFromFile();
-            if (!(holidayStorage.isEmpty()))
-            {
-                for (Storage element : holidayStorage){
-                    if (Objects.equals(nickname, element.getNickname()) && Objects.equals(password, element.getPassword())){
-                        if (compareDates(dateOfLastAuth, LocalDate.now(), element.getDate())){
+            if (!(holidayStorage.isEmpty())) {
+                for (Storage element : holidayStorage) {
+                    if (Objects.equals(nickname, element.getNickname()) && Objects.equals(password, element.getPassword())) {
+                        if (compareDates(dateOfLastAuth, LocalDate.now(), element.getDate())) {
                             answer.addMessage("Не забудь " + element.getDate().getDayOfMonth() + " " + element.getDate().getMonth() + " - " + element.getNameHoliday() + " :)");
                         }
                     }
                 }
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
         }
@@ -70,16 +69,16 @@ public class WorkWithHoliday {
         }
     }
 
-    private boolean compareDates(LocalDate dayLastAuth, LocalDate today, LocalDate holidayDay){
-        if (dayLastAuth.getMonthValue() == 12){
-            if (today.getMonthValue() == 12){
+    private boolean compareDates(LocalDate dayLastAuth, LocalDate today, LocalDate holidayDay) {
+        if (dayLastAuth.getMonthValue() == 12) {
+            if (today.getMonthValue() == 12) {
                 return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
             } else {
                 return true;
             }
         }
 
-        if ((dayLastAuth.getMonthValue() == today.getMonthValue()) && (holidayDay.getMonthValue() == today.getMonthValue())){
+        if ((dayLastAuth.getMonthValue() == today.getMonthValue()) && (holidayDay.getMonthValue() == today.getMonthValue())) {
             return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
         }
 

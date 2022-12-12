@@ -59,7 +59,8 @@ public class MessageFromBot {
     public boolean isEmpty() {
         return message == null;
     }
-    public void cleanMessage(){
+
+    public void cleanMessage() {
         message = null;
         exit = false;
         newHoliday = false;

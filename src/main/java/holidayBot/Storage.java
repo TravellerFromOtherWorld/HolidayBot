@@ -15,19 +15,19 @@ public class Storage {
         this.nameHoliday = holiday;
     }
 
-    public LocalDate getDate(){
+    public LocalDate getDate() {
         return date;
     }
 
-    public String getNickname(){
+    public String getNickname() {
         return nickname;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
-    public String getNameHoliday(){
+    public String getNameHoliday() {
         return nameHoliday;
     }
 }
