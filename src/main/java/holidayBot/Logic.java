@@ -145,10 +145,14 @@ public class Logic {
             message.cleanMessage();
             message.setMessage(phrase);
             message.setExit(true);
-            client.exit();
             return message;
         }
         message.setExit(false);
         return message;
+    }
+
+    public void clean() {
+        client.exit();
+        holiday.exit();
     }
 }

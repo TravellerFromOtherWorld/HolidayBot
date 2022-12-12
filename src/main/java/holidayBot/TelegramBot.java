@@ -71,6 +71,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     if (answer.toExit()) {
                         sendText(user, answer.getMessage(), false);
                         answer.cleanMessage();
+                        logic.clean();
                     } else {
                         sendText(user, answer.getMessage(), true);
                     }

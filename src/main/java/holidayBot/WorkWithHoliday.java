@@ -70,16 +70,9 @@ public class WorkWithHoliday {
     }
 
     private boolean compareDates(LocalDate dayLastAuth, LocalDate today, LocalDate holidayDay) {
-        if (dayLastAuth.getMonthValue() == 12) {
-            if (today.getMonthValue() == 12) {
-                return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
-            } else {
-                return true;
-            }
-        }
 
         if ((dayLastAuth.getMonthValue() == today.getMonthValue()) && (holidayDay.getMonthValue() == today.getMonthValue())) {
-            return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() >= dayLastAuth.getDayOfMonth());
+            return (holidayDay.getDayOfMonth() <= today.getDayOfMonth()) && (holidayDay.getDayOfMonth() > dayLastAuth.getDayOfMonth());
         }
 
         if (holidayDay.getMonthValue() == dayLastAuth.getMonthValue())
@@ -88,6 +81,10 @@ public class WorkWithHoliday {
         if (holidayDay.getMonthValue() == today.getMonthValue())
             return (holidayDay.getDayOfMonth() <= today.getDayOfMonth());
 
-        return (holidayDay.getMonthValue() < today.getMonthValue()) && (holidayDay.getMonthValue() >= dayLastAuth.getMonthValue());
+        return (holidayDay.getMonthValue() < today.getMonthValue()) && (holidayDay.getMonthValue() > dayLastAuth.getMonthValue());
+    }
+
+    public void exit() {
+        answer.cleanMessage();
     }
 }
