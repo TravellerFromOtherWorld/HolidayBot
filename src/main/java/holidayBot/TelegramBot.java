@@ -13,12 +13,8 @@ import java.util.*;
 public class TelegramBot extends TelegramLongPollingBot {
     private Logic logic = new Logic();
     private MessageFromBot answer = new MessageFromBot();
-    private UserData client = new UserData();
-
-    public HashMap<Long, List<Boolean>> UserStatus = new HashMap<>();
-
-    public List<Boolean> Status = new ArrayList<Boolean>();
-
+    private UserData client;
+    public HashMap<Long, UserData> UserStatus = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -37,6 +33,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             var msg = update.getMessage().getText();
             var user = update.getMessage().getChatId();
+            if (!UserStatus.containsKey(user)) {
+                UserStatus.put(user, client);
+
+            }
             detectCommand(msg, user, update.getMessage().isCommand());
 
         } else if (update.hasCallbackQuery()) {
@@ -48,15 +48,6 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void detectCommand(String msg, Long user, boolean command) {
         if (command) {
-            if (UserStatus.containsKey(user)) {
-                UserStatus.replace(user, Status);
-            } else {
-                Status.add(client.getNickname());
-                Status.add(client.getPassword());
-                Status.add(client.getDate());
-                Status.add(client.getName());
-                UserStatus.putIfAbsent(user, Status);
-            }
             if (Objects.equals(msg, "/start")) {
                 String text = """
                         Привет, мешок с костями!
@@ -113,56 +104,57 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void Authentication(Long user, String text) {
-
-        if (java.util.Objects.equals(Status.get(0), false)) {
+        var info = UserStatus.getOrDefault(user, client);
+        if (!info.getNickname()) {
             sendText(user, "Введите логин:", false);
-            Status.set(0,true);
-            UserStatus.replace(user, Status);
+            info.setNickname(true);
+            UserStatus.put(user, info);
             return;
         }
         String password = "";
-        if (java.util.Objects.equals(Status.get(1), false)) {
-            client.saveUserNickname(text);
+        if (!info.getPassword()) {
+            info.saveUserNickname(text);
             sendText(user, "Введите пароль:", false);
-            Status.set(1, true);
-            UserStatus.replace(user, Status);
+            info.setPassword(true);
+            UserStatus.put(user, info);
             return;
         } else {
             password = text;
         }
-        answer = logic.clientAuthentication(client.getUserNickname(), password);
-        Status.set(1, false);
-        Status.set(0, false);
-        UserStatus.replace(user, Status);
-        client.saveUserNickname("");
+        answer = logic.clientAuthentication(info.getUserNickname(), password);
+        info.setPassword(false);
+        info.setNickname(false);
+        info.saveUserNickname("");
         sendText(user, answer.getMessage(), true);
+        UserStatus.put(user, info);
     }
 
     private void addHoliday(Long user, String text) {
-        if (java.util.Objects.equals(Status.get(2), false)) {
+        var info = UserStatus.getOrDefault(user, client);
+        if (!info.getDate()) {
             sendText(user, text + "\nВведи дату праздника в виде YYYY-MM-DD:", false);
-            Status.set(2, true);
-            UserStatus.replace(user, Status);
+            info.setDate(true);
+            UserStatus.put(user, info);
             return;
         }
 
         String name = "";
-        if (java.util.Objects.equals(Status.get(3), false)) {
-            client.saveUserDate(text);
+        if (!info.getName()) {
+            info.saveUserDate(text);
             sendText(user, "Введите название праздника:", false);
-            Status.set(3, true);
-            UserStatus.replace(user, Status);
+            info.setName(true);
+            UserStatus.put(user, info);
             return;
         } else {
             name = text;
         }
 
-        answer = logic.newHoliday(client.getUserDate(), name);
-        Status.set(3, false);
-        Status.set(2, true);
-        UserStatus.replace(user, Status);
-        client.saveUserDate("");
+        answer = logic.newHoliday(info.getUserDate(), name);
+        info.setName(false);
+        info.setDate(false);
+        info.saveUserDate("");
         sendText(user, answer.getMessage(), true);
+        UserStatus.put(user, info);
     }
 
     public void sendInlineKeyBoardMessage(Long user, String message) {
