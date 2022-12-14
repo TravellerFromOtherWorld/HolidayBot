@@ -10,7 +10,7 @@ public class WorkWithHoliday {
 
     private MessageFromBot answer = new MessageFromBot();
     private WorkWithFiles fileWorkerPersonal = new WorkWithFiles("Holidays.txt");
-    private WorkWithFiles fileWorkerGlobal = new WorkWithFiles("GlobalHolidays.txt");
+    private WorkWithFiles fileWorkerGlobal = new WorkWithFiles("src/main/resources/GlobalHolidays.txt");
 
     public boolean correctDate(String date) {
         if (date.matches("^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$"))

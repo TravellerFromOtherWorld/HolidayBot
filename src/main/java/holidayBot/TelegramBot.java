@@ -2,7 +2,6 @@ package holidayBot;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -15,22 +14,17 @@ import java.util.Objects;
 public class TelegramBot extends TelegramLongPollingBot {
     private Logic logic = new Logic();
     private MessageFromBot answer = new MessageFromBot();
-    private boolean setNickname = false;
-    private boolean setPassword = false;
-    private boolean getDate = false;
-    private boolean getName = false;
-    private String nickname = "";
-    private String date = "";
+    private UserData client = new UserData();
 
     @Override
     public String getBotUsername() {
-        return "HolidayBot";
-    }//environment vars
+        return Objects.toString(System.getenv("NAME"));
+    }
 
     @Override
     public String getBotToken() {
-        return "5868427343:AAEvBAjFe0VoMkCb5JMwMsIiVCWEIANQn9o";
-    }//environment vars
+        return System.getenv("TOKEN");
+    }
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -106,48 +100,48 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private void Authentication(Long user, String text) {
 
-        if (!setNickname) {
+        if (!client.getNickname()) {
             sendText(user, "Введите логин:", false);
-            setNickname = true;
+            client.setNickname(true);
             return;
         }
         String password = "";
-        if (!setPassword) {
-            nickname = text;
+        if (!client.getPassword()) {
+            client.saveUserNickname(text);
             sendText(user, "Введите пароль:", false);
-            setPassword = true;
+            client.setPassword(true);
             return;
         } else {
             password = text;
         }
-        answer = logic.clientAuthentication(nickname, password);
-        setPassword = false;
-        setNickname = false;
-        nickname = "";
+        answer = logic.clientAuthentication(client.getUserNickname(), password);
+        client.setPassword(false);
+        client.setNickname(false);
+        client.saveUserNickname("");
         sendText(user, answer.getMessage(), true);
     }
 
     private void addHoliday(Long user, String text) {
-        if (!getDate) {
+        if (!client.getDate()) {
             sendText(user, text + "\nВведи дату праздника в виде YYYY-MM-DD:", false);
-            getDate = true;
+            client.setDate(true);
             return;
         }
 
         String name = "";
-        if (!getName) {
-            date = text;
+        if (!client.getName()) {
+            client.saveUserDate(text);
             sendText(user, "Введите название праздника:", false);
-            getName = true;
+            client.setName(true);
             return;
         } else {
             name = text;
         }
 
-        answer = logic.newHoliday(date, name);
-        getName = false;
-        getDate = false;
-        date = "";
+        answer = logic.newHoliday(client.getUserDate(), name);
+        client.setName(false);
+        client.setDate(false);
+        client.saveUserDate("");
         sendText(user, answer.getMessage(), true);
     }
 
