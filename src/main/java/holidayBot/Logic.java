@@ -70,7 +70,7 @@ public class Logic {
                 Чтобы ещё раз запросить информацию, напиши: "/help"
                 Чтобы закончить со мной общение, напиши: "/bye"
                 Чтобы войти в систему, напиши: "/entry"
-                Чтобы зарегистрироваться, напиши: "/register"
+                Чтобы зарегестрироваться, напиши: "/register"
                 Чтобы добавить праздник, напиши: "/addHoliday"
                 А теперь, чего ты хочешь?""";
         message.setMessage(answer);
@@ -157,9 +157,10 @@ public class Logic {
         message.cleanMessage();
     }
 
-    public void rebuildClient(String nick, String pass, boolean state, MessageFromBot oldData) {
+    public void rebuildClient(String nick, String pass, boolean state, MessageFromBot oldData, int task) {
         client.rebuildClient(nick, pass, state);
         message.copy(oldData);
+        command = task;
     }
 
     public String getPassword() {
@@ -172,5 +173,13 @@ public class Logic {
 
     public boolean getState() {
         return client.getAuthenticationStatus();
+    }
+
+    public void setCommand(int task) {
+        command = task;
+    }
+
+    public int getCommand() {
+        return command;
     }
 }

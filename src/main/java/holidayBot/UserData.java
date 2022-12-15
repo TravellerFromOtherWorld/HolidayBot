@@ -10,7 +10,15 @@ public class UserData {
     private boolean status = false;
     private String date = "";
     private MessageFromBot saveAnswer = new MessageFromBot();
+    public int command;
 
+    public void setCommand(int task) {
+        command = task;
+    }
+
+    public int getCommand() {
+        return command;
+    }
     public void setNickname(boolean data) {
         setNickname = data;
     }
@@ -84,4 +92,3 @@ public class UserData {
         status = data;
     }
 }
-
