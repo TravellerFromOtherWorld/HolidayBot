@@ -31,6 +31,12 @@ public class WorkWithClient {
         return dayLastAuth;
     }
 
+    public void rebuildClient(String nick, String pass, boolean state) {
+        nickname = nick;
+        password = pass;
+        authenticationStatus = state;
+    }
+
     //пользователь пытается войти в систему с логином и паролем.
     public MessageFromBot tryEnter(String login, String pass) {
         Storage user = findUser(login, pass);

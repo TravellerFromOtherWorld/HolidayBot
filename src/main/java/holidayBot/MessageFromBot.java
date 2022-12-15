@@ -66,4 +66,12 @@ public class MessageFromBot {
         newHoliday = false;
         authentication = false;
     }
+
+    public void copy(MessageFromBot newMessage) {
+        message = newMessage.getMessage();
+        authentication = newMessage.getAuthentication();
+        exit = newMessage.toExit();
+        newHoliday = newMessage.getNewHoliday();
+        errors = newMessage.getErrors();
+    }
 }

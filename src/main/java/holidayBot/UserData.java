@@ -6,7 +6,10 @@ public class UserData {
     private boolean getDate = false;
     private boolean getName = false;
     private String nickname = "";
+    private String password = "";
+    private boolean status = false;
     private String date = "";
+    private MessageFromBot saveAnswer = new MessageFromBot();
 
     public void setNickname(boolean data) {
         setNickname = data;
@@ -40,6 +43,14 @@ public class UserData {
         return getName;
     }
 
+    public void saveUserPassword(String data) {
+        password = data;
+    }
+
+    public String getUserPassword() {
+        return password;
+    }
+
     public void saveUserNickname(String data) {
         nickname = data;
     }
@@ -48,6 +59,7 @@ public class UserData {
         return nickname;
     }
 
+
     public void saveUserDate(String data) {
         date = data;
     }
@@ -55,4 +67,21 @@ public class UserData {
     public String getUserDate() {
         return date;
     }
+
+    public void setSaveAnswer(MessageFromBot data) {
+        saveAnswer.copy(data);
+    }
+
+    public MessageFromBot getSaveAnswer() {
+        return saveAnswer;
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean data) {
+        status = data;
+    }
 }
+
