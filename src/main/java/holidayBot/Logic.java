@@ -48,7 +48,7 @@ public class Logic {
         return true;
     }
 
-    public MessageFromBot work() {
+    public MessageFromBot work(UserData user) {
         switch (command) {
             case HELP:
                 return help();
@@ -56,7 +56,7 @@ public class Logic {
             case REGISTER:
                 return clientAuthentication();
             case ADDHOLIDAY:
-                return newHoliday();
+                return newHolidayIn(user);
             default:
                 return exit();
         }
@@ -85,10 +85,10 @@ public class Logic {
     }
 
     //функция проводит либо регистрацию, либо вход и возврашает сообщение типа MessageFromBot, сообщая результат
-    public MessageFromBot clientAuthentication(String login, String password) {
-        if (!Objects.equals(login, "") && !Objects.equals(password, "")) {
+    public MessageFromBot clientAuthentication(UserData user) {
+        if (!Objects.equals(user.getUserNickname(), "") && !Objects.equals(user.getUserPassword(), "")) {
 
-            if (client.getAuthenticationStatus()) {
+            if (user.getStatus()) {
                 message.setMessage("""
                         Ты уже используешь свою учётную запись.
                         Чтобы зарегистрировать другой аккаунт, выйди из системы.
@@ -97,17 +97,17 @@ public class Logic {
                 return message;
             }
             if (command == ENTER) {
-                message = client.tryEnter(login, password);
+                message = client.tryEnter(user);
             }
             if (command == REGISTER) {
-                message = client.tryRegister(login, password);
+                message = client.tryRegister(user);
             }
             if (message.getErrors() != 0) {
                 message.setAuthentication(false);
                 return message;
             }
-            if (client.getAuthenticationStatus()) {
-                message.addMessage(holiday.remindHoliday(client.getNickname(), client.getPassword(), client.getDayLastAuth()).getMessage());
+            if (user.getStatus()) {
+                message.addMessage(holiday.remindHoliday(user.getUserNickname(), user.getUserPassword(), user.getDayLastAuth()).getMessage());
                 message.addMessage("Что ты хочешь сделать дальше?");
             }
         } else
@@ -116,8 +116,8 @@ public class Logic {
         return message;
     }
 
-    private MessageFromBot newHoliday() {
-        if (client.getAuthenticationStatus()) {
+    private MessageFromBot newHolidayIn(UserData user) {
+        if (user.getStatus()) {
             message.setMessage("Хорошо, давай начнём.");
             message.setNewHoliday(true);
         } else {
@@ -126,9 +126,9 @@ public class Logic {
         return message;
     }
 
-    public MessageFromBot newHoliday(String date, String name) {
-        if (!(Objects.equals(date, "")) && !(Objects.equals(name, ""))) {
-            message = holiday.addNewHoliday(date, name, client.getNickname(), client.getPassword());
+    public MessageFromBot newHoliday(UserData user) {
+        if (!(Objects.equals(user.getUserDate(), "")) && !(Objects.equals(user.getNameOfHoliday(), ""))) {
+            message = holiday.addNewHoliday(user.getUserDate(), user.getNameOfHoliday(), user.getUserNickname(), user.getUserPassword());
             if (message.getErrors() == 0) {
                 message.addMessage("Что ты хочешь сделать дальше?");
             }
@@ -152,34 +152,15 @@ public class Logic {
     }
 
     public void clean() {
-        client.exit();
         holiday.exit();
         message.cleanMessage();
     }
 
-    public void rebuildClient(String nick, String pass, boolean state, MessageFromBot oldData, int task) {
-        client.rebuildClient(nick, pass, state);
-        message.copy(oldData);
-        command = task;
-    }
-
-    public String getPassword() {
-        return client.getPassword();
-    }
-
-    public String getNickname() {
-        return client.getNickname();
-    }
-
-    public boolean getState() {
-        return client.getAuthenticationStatus();
-    }
-
-    public void setCommand(int task) {
-        command = task;
-    }
-
     public int getCommand() {
         return command;
+    }
+
+    public void setCommand(int task){
+        command = task;
     }
 }

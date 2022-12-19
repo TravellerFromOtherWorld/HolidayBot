@@ -8,44 +8,16 @@ import java.util.Objects;
 
 public class WorkWithClient {
     private MessageFromBot answer = new MessageFromBot();
-    private String nickname;
-    private String password;
-    private boolean authenticationStatus = false;
-    private LocalDate dayLastAuth;
     private WorkWithFiles fileWorker = new WorkWithFiles("Users.txt");
     final int fileError = 1;
 
-    public boolean getAuthenticationStatus() {
-        return authenticationStatus;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public LocalDate getDayLastAuth() {
-        return dayLastAuth;
-    }
-
-    public void rebuildClient(String nick, String pass, boolean state) {
-        nickname = nick;
-        password = pass;
-        authenticationStatus = state;
-    }
-
     //пользователь пытается войти в систему с логином и паролем.
-    public MessageFromBot tryEnter(String login, String pass) {
-        Storage user = findUser(login, pass);
+    public MessageFromBot tryEnter(UserData userStatus) {
+        Storage user = findUser(userStatus.getUserNickname(), userStatus.getUserPassword());
         if (user != null) {
             answer.setMessage("Привет! Давно не виделись)");
-            nickname = login;
-            password = pass;
-            dayLastAuth = user.getDate();
-            authenticationStatus = true;
+            userStatus.saveDayLastAuth(user.getDate());
+            userStatus.setStatus(true);
             answer.setAuthentication(false);
             try {
                 fileWorker.rewriteAllFile(user);
@@ -59,26 +31,26 @@ public class WorkWithClient {
             answer.setMessage("""
                     Ты не достоин!
                     Приплыли... Что дальше?""");
+            userStatus.saveUserNickname("");
+            userStatus.saveUserPassword("");
         }
         return answer;
     }
 
     //пользователь пытается зарегистрироваться в системе, вводя логин и пароль
-    public MessageFromBot tryRegister(String login, String pass) {
-        if (findUser(login, pass) != null) {
+    public MessageFromBot tryRegister(UserData userStatus) {
+        if (findUser(userStatus.getUserNickname(), userStatus.getUserPassword()) != null) {
             if (answer.getErrors() == 0) {
                 answer.setMessage("Придумай другой логин и пароль");
             }
             return answer;
         }
-        addNewUser(login, pass);
+        addNewUser(userStatus.getUserNickname(), userStatus.getUserPassword());
         if (answer.getErrors() == 0) {
             answer.setMessage("Регистрация прошла упешно!");
-            nickname = login;
-            password = pass;
-            dayLastAuth = LocalDate.now();
+            userStatus.saveDayLastAuth(LocalDate.now());
             answer.setAuthentication(false);
-            authenticationStatus = true;
+            userStatus.setStatus(true);
         }
         return answer;
     }
@@ -112,12 +84,5 @@ public class WorkWithClient {
             answer.setMessage("Произошла ошибка");
             answer.setErrors(fileError);
         }
-    }
-
-    public void exit() {
-        nickname = null;
-        password = null;
-        authenticationStatus = false;
-        dayLastAuth = null;
     }
 }

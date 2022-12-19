@@ -1,4 +1,4 @@
-package holidayBot;
+/*package holidayBot;
 
 import java.io.File;
 
@@ -84,3 +84,4 @@ class WorkWithClientTest {
     }
 
 }
+*/

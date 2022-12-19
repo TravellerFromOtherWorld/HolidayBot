@@ -1,4 +1,4 @@
-package holidayBot;
+/* package holidayBot;
 
 import java.util.Scanner;
 
@@ -51,3 +51,4 @@ public class Dialog {
         }
     }
 }
+*/

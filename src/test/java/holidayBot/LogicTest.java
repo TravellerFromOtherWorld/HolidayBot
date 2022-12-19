@@ -1,4 +1,6 @@
+/*
 package holidayBot;
+
 
 import org.junit.jupiter.api.Test;
 
@@ -33,3 +35,5 @@ class LogicTest {
         assertTrue(testMessage.toExit());
     }
 }
+
+ */

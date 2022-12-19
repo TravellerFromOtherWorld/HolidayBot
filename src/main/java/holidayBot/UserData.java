@@ -1,5 +1,7 @@
 package holidayBot;
 
+import java.time.LocalDate;
+
 public class UserData {
     private boolean setNickname = false;
     private boolean setPassword = false;
@@ -7,10 +9,19 @@ public class UserData {
     private boolean getName = false;
     private String nickname = "";
     private String password = "";
+    private LocalDate dayLastAuth;
     private boolean status = false;
     private String date = "";
+    private String nameOfHoliday = "";
     private MessageFromBot saveAnswer = new MessageFromBot();
-    public int command;
+    private int command;
+    public void saveDayLastAuth(LocalDate date) {
+        dayLastAuth = date;
+    }
+
+    public LocalDate getDayLastAuth() {
+        return dayLastAuth;
+    }
 
     public void setCommand(int task) {
         command = task;
@@ -90,5 +101,13 @@ public class UserData {
 
     public void setStatus(boolean data) {
         status = data;
+    }
+
+    public void saveNameOfHoliday(String data) {
+        nameOfHoliday = data;
+    }
+
+    public String getNameOfHoliday() {
+        return nameOfHoliday;
     }
 }
