@@ -14,8 +14,6 @@ import java.util.Objects;
 
 public class TelegramBot extends TelegramLongPollingBot {
     private Logic logic = new Logic();
-    private MessageFromBot answer = new MessageFromBot();
-    private UserData client;
     public HashMap<Long, UserData> UserStatus = new HashMap<>();
 
     @Override
@@ -36,33 +34,27 @@ public class TelegramBot extends TelegramLongPollingBot {
             var msg = update.getMessage().getText();
             var user = update.getMessage().getChatId();
             if (!UserStatus.containsKey(user)) {
-                client = new UserData();
-                answer = client.getSaveAnswer();
-                UserStatus.put(user, client);
+                UserStatus.put(user, new UserData());
+                detectCommand(msg, user, update.getMessage().isCommand(), UserStatus.get(user));
             } else {
-                client = UserStatus.get(user);
-                answer = client.getSaveAnswer();
-                logic.setCommand(client.getCommand());
+                logic.setCommand(UserStatus.get(user).getCommand());
+                detectCommand(msg, user, update.getMessage().isCommand(), UserStatus.get(user));
             }
-            detectCommand(msg, user, update.getMessage().isCommand());
 
         } else if (update.hasCallbackQuery()) {
             var msg = update.getCallbackQuery().getData();
             var user = update.getCallbackQuery().getMessage().getChatId();
             if (!UserStatus.containsKey(user)) {
-                client = new UserData();
-                answer = client.getSaveAnswer();
-                UserStatus.put(user, client);
+                UserStatus.put(user, new UserData());
+                detectCommand(msg, user, true, UserStatus.get(user));
             } else {
-                client = UserStatus.get(user);
-                answer = client.getSaveAnswer();
-                logic.setCommand(client.getCommand());
+                logic.setCommand(UserStatus.get(user).getCommand());
+                detectCommand(msg, user, true, UserStatus.get(user));
             }
-            detectCommand(msg, user, true);
         }
     }
 
-    private void detectCommand(String msg, Long user, boolean command) {
+    private void detectCommand(String msg, Long user, boolean command, UserData userStat) {
         if (command) {
             if (Objects.equals(msg, "/start")) {
                 String text = """
@@ -76,31 +68,31 @@ public class TelegramBot extends TelegramLongPollingBot {
             if (logic.cantDetect(msg)) { //здесь распознаётся запрос
                 sendText(user, "Ай карамба! Ты ошибся, попробуй ещё раз!", false);
             } else {
-                answer = logic.work(client);
+                userStat.setSaveAnswer(logic.work(userStat));
 
-                if (!answer.getAuthentication()) {
-                    if (answer.getNewHoliday()) {
-                        addHoliday(user, answer.getMessage());
-                        saveState(answer, logic.getCommand());
+                if (!userStat.getSaveAnswer().getAuthentication()) {
+                    if (userStat.getSaveAnswer().getNewHoliday()) {
+                        addHoliday(user, userStat.getSaveAnswer().getMessage(), userStat);
+                        saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
                         return;
                     }
-                    if (answer.toExit()) {
-                        sendText(user, answer.getMessage(), false);
-                        answer.cleanMessage();
+                    if (userStat.getSaveAnswer().toExit()) {
+                        sendText(user, userStat.getSaveAnswer().getMessage(), false);
+                        userStat.getSaveAnswer().cleanMessage();
                         logic.clean();
                         UserStatus.remove(user);
                     } else {
-                        sendText(user, answer.getMessage(), true);
-                        saveState(answer, logic.getCommand());
+                        sendText(user, userStat.getSaveAnswer().getMessage(), true);
+                        saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
                     }
                 } else {
-                    authentication(user, msg);
+                    authentication(user, msg, userStat);
                 }
             }
-        } else if (answer.getAuthentication()) {
-            authentication(user, msg);
-        } else if (answer.getNewHoliday()) {
-            addHoliday(user, msg);
+        } else if (userStat.getSaveAnswer().getAuthentication()) {
+            authentication(user, msg, userStat);
+        } else if (userStat.getSaveAnswer().getNewHoliday()) {
+            addHoliday(user, msg, userStat);
         } else {
             sendText(user, "Ай карамба! Ты ошибся, попробуй ещё раз!", false);
         }
@@ -122,65 +114,65 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void authentication(Long user, String text) {
+    private void authentication(Long user, String text, UserData userStat) {
 
-        if (!client.getNickname()) {
+        if (!userStat.getNickname()) {
             sendText(user, "Введите логин:", false);
-            client.setNickname(true);
-            saveState(answer, logic.getCommand());
-            UserStatus.put(user, client);
+            userStat.setNickname(true);
+            saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
+            UserStatus.put(user, userStat);
             return;
         }
-        if (!client.getPassword()) {
+        if (!userStat.getPassword()) {
             sendText(user, "Введите пароль:", false);
-            client.setPassword(true);
-            client.saveUserNickname(text);
-            saveState(answer, logic.getCommand());
-            UserStatus.put(user, client);
+            userStat.setPassword(true);
+            userStat.saveUserNickname(text);
+            saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
+            UserStatus.put(user, userStat);
             return;
         } else {
-            client.saveUserPassword(text);
+            userStat.saveUserPassword(text);
         }
-        answer = logic.clientAuthentication(client);
-        client.setPassword(false);
-        client.setNickname(false);
-        saveState(answer, logic.getCommand());
-        UserStatus.put(user, client);
-        sendText(user, answer.getMessage(), true);
+        userStat.setSaveAnswer(logic.clientAuthentication(userStat));
+        userStat.setPassword(false);
+        userStat.setNickname(false);
+        saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
+        UserStatus.put(user, userStat);
+        sendText(user, userStat.getSaveAnswer().getMessage(), true);
     }
 
-    private void addHoliday(Long user, String text) {
-        if (!client.getDate()) {
+    private void addHoliday(Long user, String text, UserData userStat) {
+        if (!userStat.getDate()) {
             sendText(user, text + "\nВведи дату праздника в виде YYYY-MM-DD:", false);
-            client.setDate(true);
-            saveState(answer, logic.getCommand());
-            UserStatus.put(user, client);
+            userStat.setDate(true);
+            saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
+            UserStatus.put(user, userStat);
             return;
         }
 
-        if (!client.getName()) {
-            client.saveUserDate(text);
+        if (!userStat.getName()) {
+            userStat.saveUserDate(text);
             sendText(user, "Введите название праздника:", false);
-            client.setName(true);
-            saveState(answer, logic.getCommand());
-            UserStatus.put(user, client);
+            userStat.setName(true);
+            saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
+            UserStatus.put(user, userStat);
             return;
         } else {
-            client.saveNameOfHoliday(text);
+            userStat.saveNameOfHoliday(text);
         }
 
-        answer = logic.newHoliday(client);
-        client.setName(false);
-        client.setDate(false);
-        client.saveUserDate("");
-        saveState(answer, logic.getCommand());
-        UserStatus.put(user, client);
-        sendText(user, answer.getMessage(), true);
+        userStat.setSaveAnswer(logic.newHoliday(userStat));
+        userStat.setName(false);
+        userStat.setDate(false);
+        userStat.saveUserDate("");
+        saveState(userStat.getSaveAnswer(), logic.getCommand(), userStat);
+        UserStatus.put(user, userStat);
+        sendText(user, userStat.getSaveAnswer().getMessage(), true);
     }
 
-    private void saveState(MessageFromBot ans, int task) {
-        client.setSaveAnswer(ans);
-        client.setCommand(task);
+    private void saveState(MessageFromBot ans, int task, UserData userStat) {
+        userStat.setSaveAnswer(ans);
+        userStat.setCommand(task);
     }
 
     public void sendInlineKeyBoardMessage(Long user, String message) {
